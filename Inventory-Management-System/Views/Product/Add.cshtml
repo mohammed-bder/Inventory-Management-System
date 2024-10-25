@@ -1,0 +1,74 @@
+﻿@model ProductWithCategoriesViewModel
+
+@{
+    ViewData["Title"] = "Add";
+    SelectList categories = new SelectList(Model.categories, "ID", "Name");
+    SelectList supplier = new SelectList(Model.suppliers, "ID", "Name");
+}
+
+<h1 class="mb-4 text-center fw-bold text-primary">Add Product</h1>
+<hr class="mb-4" />
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <form asp-action="SaveAdd" asp-controller="Product" class="shadow p-4 rounded bg-white">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <!-- Product Name -->
+            <div class="form-group mb-3">
+                <label asp-for="Name" class="form-label fw-bold"></label>
+                <input asp-for="Name" class="form-control" placeholder="Enter product name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <!-- Unit Price -->
+            <div class="form-group mb-3">
+                <label asp-for="UnitPrice" class="form-label fw-bold"></label>
+                <input asp-for="UnitPrice" class="form-control" placeholder="Enter unit price" />
+                <span asp-validation-for="UnitPrice" class="text-danger"></span>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group mb-3">
+                <label asp-for="Description" class="form-label fw-bold"></label>
+                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter product description"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <!-- Category Selection -->
+            <div class="form-group mb-3">
+                <label asp-for="CategoryId" class="form-label fw-bold">Category</label>
+                <select asp-for="CategoryId" asp-items="categories" class="form-control">
+                    <option value="">-- Select Category --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <!-- Supplier Selection -->
+            <div class="form-group mb-4">
+                <label asp-for="SupplierId" class="form-label fw-bold">Supplier</label>
+                <select asp-for="SupplierId" asp-items="supplier" class="form-control">
+                    <option value="">-- Select Supplier --</option>
+                </select>
+                <span asp-validation-for="SupplierId" class="text-danger"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group d-grid gap-2">
+                <input type="submit" value="Add Product" class="btn btn-primary btn-lg" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Back Link -->
+<div class="mt-4 text-center">
+    <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+        <i class="fas fa-arrow-left me-2"></i> Back to List
+    </a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

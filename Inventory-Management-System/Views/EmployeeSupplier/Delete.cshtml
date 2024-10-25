@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Delete</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Ensure the body and html take the full height */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Flexbox to center the container */
+        .mycontainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Takes full viewport height */
+/*             margin-left: 62vh;   */
+            margin-top: -55px;
+        }
+
+        /* Style the card with shadow and rounded corners */
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Scrollable section for employee details */
+        .scrollable-card-body {
+            max-height: 300px; /* Set the max height */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+
+        /* Custom alert styling */
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+
+        /* Red text for warnings */
+        .text-danger {
+            color: #cd0017;
+        }
+
+        /* Buttons styling */
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        .btn-secondary {
+            margin-left: 10px;
+        }
+
+        /* Extra margin for spacing */
+        .mt-3 {
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mycontainer">
+        <!-- Confirmation section for item deletion -->
+        <div class="alert alert-warning" role="alert" style="max-width: 700px; width: 100%;">
+            <h4 class="text-danger">Are you sure you want to delete this Receipts?</h4>
+            <p>Please confirm that you want to delete the following item from the system. This action cannot be undone.</p>
+            <hr>
+
+            <!-- Employee details -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="text-danger">Item Details</h5>
+                </div>
+
+                <!-- Make the list scrollable -->
+                <div class="scrollable-card-body">
+                @{
+                    int index1 = 0;
+                }
+                    @foreach (var item in Model.employeeSuppliers)
+                    {
+                        <div class="card-body">
+                            <p><strong>ID:</strong> @item?.Id </p>
+                            <p><strong>Employee Name:</strong> @(item?.Employee.FName) @item?.Employee.LName</p>
+                            <p><strong>Supplier Name:</strong> @item?.Supplier.Name</p>
+                            <p><strong>Product Name:</strong> @Model?.productNames[index1]</p>
+                            <p><strong>Quantity:</strong> @item?.Quantity</p>
+                            <p><strong>Total Cost:</strong> @item?.TotalCost</p>
+                            <p><strong>Date Of Creation:</strong> @item?.StartDate</p>
+                        </div>
+                        <hr/>
+                        index1++;
+                    }
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="mt-3">
+                <form asp-action="deleteConfirmed" asp-controller="EmployeeSupplier" method="POST">
+                    @foreach (var id in Model.employeeSupplierIds)
+                    {
+                        <input type="hidden" name="employeeIds" value="@id" />
+                    }
+                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                    <a href="/EmployeeSupplier/Index" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+﻿@*------------------------------------------------------------------------------*@
+
+@model AlertWithEmployeesProductViewModel
+
+@{
+    ViewData["Title"] = "Update Alert";
+}
+
+<h2 class="text-primary mb-4">Update Alert</h2>
+
+<form action="SaveUpdate?id=@Model.ID" method="post" class="shadow-lg p-4 bg-white rounded">
+
+    <!-- Alert Date -->
+    <div class="form-group">
+        <label asp-for="AlertDate" class="control-label">Alert Date</label>
+        <input asp-for="AlertDate" type="datetime-local" class="form-control" value="@Model.AlertDate.ToString("yyyy-MM-ddTHH:mm")" readonly />
+    </div>
+
+
+    <!-- Alert Quantity Level -->
+    <div class="form-group mb-3">
+        <label asp-for="AlertQuantityLevel" class="form-label">Alert Quantity Level</label>
+        <input asp-for="AlertQuantityLevel" type="number" class="form-control" placeholder="Enter quantity level" value="@Model.AlertQuantityLevel" />
+    </div>
+
+    <!-- Employee Selection -->
+    <div class="form-group mb-3">
+        <label for="EmployeeId" class="form-label">Select Employee</label>
+        <select id="EmployeeId" asp-for="EmployeeId" class="form-select">
+            <option value="">-- Select Employee --</option> <!-- Optional: Add a default option -->
+            @foreach (var item in Model.Employees!)
+            {
+
+                if (Model.EmployeeId == item.ID)
+                {
+                    <option value="@item.ID" selected>@(item.FName + " " + item.LName)</option>
+                }
+                else
+                {
+                    <option value="@item.ID">@(item.FName + " " + item.LName)</option>
+                }
+            }
+        </select>
+    </div>
+
+    <!-- Product Selection -->
+    <div class="form-group mb-3">
+        <label for="ProductId" class="form-label">Select Product</label>
+        <select id="ProductId" asp-for="ProductId" class="form-select">
+            <option value="">-- Select Product --</option> <!-- Optional: Add a default option -->
+            @foreach (var item in Model.Products!)
+            {
+
+                if (Model.ProductId == item.ID)
+                {
+                    <option value="@item.ID" selected>@(item.Name)</option>
+                }
+                else
+                {
+
+                    <option value="@item.ID">@(item.Name)</option>
+                }
+            }
+        </select>
+    </div>
+
+    <!-- Is Resolved Checkbox -->
+    <div class="form-check mb-4">
+        <input asp-for="IsResolved" class="form-check-input" type="checkbox" id="IsResolved" />
+        <label asp-for="IsResolved" class="form-check-label" >
+            Is Resolved
+        </label>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-between align-items-center">
+        <button type="submit" class="btn btn-success btn-lg">
+            <i class="bi bi-plus-circle"></i> update Alert
+        </button>
+        <a href="/Alert" class="btn btn-outline-secondary btn-lg">
+            <i class="bi bi-arrow-left-circle"></i> Cancel
+        </a>
+    </div>
+</form>

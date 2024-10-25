@@ -1,0 +1,44 @@
+﻿@model Supplier
+@{
+    ViewData["Title"] = "Add";
+}
+
+<h1 class="center text-center">Add Supplier</h1>
+<hr />
+<br />
+
+<form action="SaveAdd" method="post" class="shadow-lg p-4 bg-white rounded">
+    <!-- Supplier Name -->
+    <div class="form-group mb-3">
+        <label asp-for="Name" class="form-label">Supplier Name</label>
+        <input asp-for="Name" class="form-control" placeholder="Enter supplier name" required />
+    </div>
+
+    <!-- Supplier Address -->
+    <div class="form-group mb-3">
+        <label asp-for="Address" class="form-label">Supplier Address</label>
+        <input asp-for="Address" class="form-control" placeholder="Enter supplier address" required />
+    </div>
+
+    <!-- Supplier Email -->
+    <div class="form-group mb-3">
+        <label asp-for="Email" class="form-label">Supplier Email</label>
+        <input asp-for="Email" type="email" class="form-control" placeholder="Enter supplier email" required />
+    </div>
+
+    <!-- Supplier Phone -->
+    <div class="form-group mb-3">
+        <label asp-for="Phone" class="form-label">Supplier Phone</label>
+        <input asp-for="Phone" type="tel" class="form-control" placeholder="Enter supplier phone" required />
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-between align-items-center">
+        <button type="submit" asp-action="SaveAdd" class="btn btn-success btn-lg">
+            <i class="bi bi-plus-circle"></i> Add Supplier <!-- Submit button for adding supplier -->
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+            <i class="bi bi-arrow-left-circle"></i> Cancel
+        </a>
+    </div>
+</form>

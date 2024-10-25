@@ -1,0 +1,141 @@
+﻿@model List<StartAlert>
+
+@{
+    ViewData["Title"] = "Start Alerts";
+}
+
+<div style="   ">
+
+    <h2 class ="text-primary">Start Alerts</h2>
+
+
+<div class="d-flex justify-content-center mb-3">
+    @*
+
+    <div>
+        <input type="text" class="form-control" placeholder="Search alert ID" aria-label="Search">
+    </div>
+    *@
+    <div>
+        @*
+
+        <button class="btn btn-primary">Export to Excel</button>
+        <button class="btn btn-secondary">Import Alerts</button>
+        *@
+        <a href="@Url.Action("Add", "Alert")" class="btn btn-success">+ New Alert</a>
+        <a href="@Url.Action("ExportToExcel", "Alert")" class="btn btn-primary">Export to Excel</a>
+
+
+    </div>
+</div>
+
+    <div class="mb-3 d-flex align-items-center justify-content-between" style="margin-top: 12px;">
+        <form asp-action="Search" asp-controller="Alert" method="get" class="d-flex" id="searchForm">
+            <div class="input-group me-3" style="width: 300px;">
+                <span class="input-group-text bg-white" id="basic-addon1" style="border-right: none; height: 38px; width: 35px; font-size: 20px;">
+                    <i class="bi bi-search"></i> <!-- Bootstrap Icon for search -->
+                </span>
+                                                                
+                <input type="text" name="name" class="form-control" id="searchInput" placeholder="Search By Product Name" aria-label="Quick search" aria-describedby="basic-addon1" style="border-left: none;" />
+            </div>
+           @*
+            <input type="hidden" name="id" value="@ViewBag.SelectedCategoryId" /> <!-- Or provide the value dynamically -->
+           *@
+
+           
+           <button class="btn btn-primary" type="submit">Search</button> <!-- Optional Search Button -->
+           
+           
+           
+           <input type="hidden" name="status" id="statusInput" />
+        </form>
+
+ 
+
+        <div>
+            <select id="statusFilter" class="form-select d-inline" aria-label="Filter by status" onchange="filterByStatus()">
+                @if(ViewBag.status == "")
+                {
+                    <option value="" selected>All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                }
+                else if (ViewBag.status == "Pending")
+                {
+                    <option value="" >All Status</option>
+                    <option value="Pending" selected>Pending</option>
+                    <option value="Completed">Completed</option>
+                }
+                else if (ViewBag.status == "Completed")
+                {
+                     <option value="" >All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Completed" selected>Completed</option>
+                }
+            </select>
+        </div>
+
+
+    </div>
+
+<table class="table table-bordered text-center">
+    <thead>
+        <tr>
+            <th scope="col">
+                <input type="checkbox" />
+            </th>
+            <th scope="col">Alert ID</th>
+            <th scope="col">Date Created</th>
+            <th scope="col">Employee</th>
+            <th scope="col">Product</th>
+            <th scope="col">Stock Quantity</th>
+            <th scope="col">Quantity Level</th>
+            <th scope="col">Date Solved</th>
+            <th scope="col">Status</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var alert in Model)
+        {
+            <tr>
+                <td>
+                    <input type="checkbox" />
+                </td>
+                <td>@alert.ID</td>
+                <td>@alert.AlertDate.ToString("dd/MM/yyyy")</td>
+                <td>@(alert.employee.FName +" " + alert.employee.LName)</td>
+                <td>@alert.product.Name</td>
+                <td>@alert.product.StockQuantity</td>
+                <td>@alert.AlertQuantityLevel</td>
+                    <td>@(alert.IsResolved ? alert.ResolveDate.GetValueOrDefault().ToString("dd/MM/yyyy hh:mm tt") : "not Resolved!")</td>
+                <td>
+                    @if (alert.IsResolved)
+                    {
+                        <span class="badge bg-success">Completed</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning">Pending</span>
+                    }
+                </td>
+                <td>
+                    <a href="/Alert/Update?id=@alert.ID" class="btn btn-warning btn-sm">Update</a>
+                    <a href="@Url.Action("Delete", "StartAlerts", new { id = alert.ID })" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+</div>
+
+
+<script>
+    function filterByStatus() {
+        var statusValue = document.getElementById('statusFilter').value;
+        document.getElementById('statusInput').value = statusValue;
+        document.getElementById('searchForm').submit();
+    }
+</script>
+

@@ -1,0 +1,291 @@
+﻿@model List<EmployeeSupplier>
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Ensure the body and html take the full height */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+        }
+
+        /* Make the mycontainer fill the remaining space */
+        .mycontainer-fluid {
+            padding: 15px;
+        }
+
+        .mycontainer {
+            width: 100%;
+            padding: 35px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .table thead th {
+            background-color: #fafafa;
+            color: #5a5a5a;
+            font-weight: bold;
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+            height: 40px;
+            background-color: #838383; /* The blue color */
+            border-radius: 20px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /*green button view*/
+        .btn-darkgreen {
+            background-color: #3d953d !important; /* Dark green */
+            color: white;
+            border: none;
+            padding: 7px 20px;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+            .btn-darkgreen:hover {
+                background-color: #006400 !important; /* Slightly darker on hover */
+                color: white !important; /* Keep text white on hover */
+            }
+
+            .btn-darkgreen i {
+                margin-left: 10px; /* Space between text and icon */
+                font-size: 18px;
+            }
+        /*green button view*/
+
+        .btn-primarycreated {
+            color: white !important; /* Keep text white on hover */
+            background-color: #F21667;
+            border-color: #F21667;
+        }
+
+        .btn-primarycreated:hover {
+                background-color: #0062CC;
+                border-color: #0062CC;
+        }
+
+        /* Input Field */
+        .search-txt {
+            width: 80%;
+            padding: 10px;
+            border: none;
+            outline: none;
+            background: none;
+            color: #ffffff;
+            font-size: 16px;
+            border-radius: 30px;
+        }
+
+        /* Search Icon Button */
+        .search-btn {
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+        }
+
+            /* Font Awesome Icon */
+            .search-btn i {
+                color: rgb(252, 252, 252);
+                cursor: pointer;
+            }
+
+        .search-txt::placeholder {
+            color: #ccc; /* Change this color to whatever you want */
+        }
+
+        .btn-primary {
+            background-color: #6c63ff;
+            border-color: #6c63ff;
+        }
+
+        .btn-outline-primary {
+            color: #6c63ff;
+            border-color: #6c63ff;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+        }
+
+        /* Ensure that the content inside the mycontainer takes full height */
+        .content {
+            height: 100%;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mycontainer-fluid">
+        <div class="mycontainer mt-4 content">
+            <!-- First Row: Title and Action Buttons -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h2 style="color:#F21667; !important;">Editable Receipt</h2>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button id="delete-btn" class="btn btn-danger d-none">Delete Selected</button>
+                    <a href="@Url.Action("ExportToExcel", "Employee")" class="btn btn-darkgreen">
+                        Export to Excel
+                        <i class="fas fa-file-excel"></i>
+                    </a>
+                    <button class="btn btn-primarycreated" onclick="window.location.href='/EmployeeSupplier/Index'">All Receipts</button>
+                    <button class="btn btn-primary" onclick="window.location.href='/EmployeeSupplier/Add'">New Receipt</button>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- Separate Search Form -->
+            <div class="row mb-4">
+                <!-- Second Row: Search and Filters -->
+                <div class="col-md-6">
+                    <form action="/EmployeeSupplier/Search" method="get" class="search-box" id="searchForm" style="background-color:#F21667 !important;">
+                        <input type="text" class="search-txt" placeholder="Search by Products" id="StringFromRequest" name="StringFromRequest">
+                        <button type="submit" class="search-btn">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-6 d-flex justify-content-end">
+                    <button class="btn btn-light me-2">
+                        <i class="bi bi-calendar"></i>
+                    </button>
+                    <button class="btn btn-light me-2 dropdown-toggle" data-bs-toggle="dropdown">Sales</button>
+                    <button class="btn btn-light me-2 dropdown-toggle" data-bs-toggle="dropdown">Status</button>
+                    <button class="btn btn-light">Filter</button>
+                </div>
+            </div>
+
+            <!-- Receipt Table -->
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all"></th>
+                        <th>ID</th>
+                        <th>Employee Name</th>
+                        <th>Supplier Name</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Total Cost</th>
+                        <th>StartDate</th>
+                        <th>Actions</th> <!-- Add this for actions like edit -->
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int index0 = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><input type="checkbox" name="employeeSupplierIds" value="@item?.Id" class="select-item"></td>
+                            <td>@item?.Id</td>
+                            <td>@item?.Employee.FName @item?.Employee.LName</td>
+                            <td>@item?.Supplier.Name</td>
+                            <td>@ViewBag.Products0[index0]</td>
+                            <td>@item?.Quantity</td>
+                            <td>@item?.TotalCost</td>
+                            <td>@item?.StartDate</td>
+                            <td>
+                                <!-- Edit button -->
+                                <a href="/EmployeeSupplier/Edit/@item.Id" class="btn btn-warning btn-sm">Edit</a>
+                            </td>
+                        </tr>
+                        index0++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>  
+
+    <!-- Hidden form for delete action -->
+    <form id="deleteForm" method="post" asp-action="Delete" asp-controller="EmployeeSupplier">
+        <input type="hidden" name="employeeSupplierIds" id="employeeSupplierIds" />
+    </form>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to toggle the delete button visibility
+        function toggleDeleteButton() {
+            const anyChecked = $('.select-item:checked').length > 0;
+            if (anyChecked) {
+                $('#delete-btn').removeClass('d-none');
+            } else {
+                $('#delete-btn').addClass('d-none');
+            }
+        }
+
+        // Event Listener for individual checkboxes
+        $('.select-item').on('change', toggleDeleteButton);
+
+        // Select/Deselect all checkboxes and toggle the delete button accordingly
+        $('#select-all').on('change', function () {
+            $('.select-item').prop('checked', this.checked);
+            toggleDeleteButton();
+        });
+
+        // Handle the delete button click
+$('#delete-btn').on('click', function () {
+    // Clear existing hidden inputs for employee IDs
+    $('#deleteForm').find('input[name="employeeIds"]').remove();
+
+    // Get all selected IDs
+    const selectedIds = $('.select-item:checked').map(function () {
+        return $(this).val();
+    }).get();
+
+    // Append a hidden input for each selected ID
+    selectedIds.forEach(function(id) {
+        $('#deleteForm').append('<input type="hidden" name="employeeIds" value="' + id + '" />');
+    });
+
+    // Submit the form if there are selected IDs
+    if (selectedIds.length > 0) {
+        $('#deleteForm').submit();
+    }
+});
+
+
+        // Initial call to ensure the delete button is hidden
+        toggleDeleteButton();
+    </script>
+
+</body>
+
+</html>
+

@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management System</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+
+
+
+    <!-- Include the required Bootstrap CSS  for  notification center-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+
+
+    <!-- Full version of jQuery for AJAX -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+
+
+</head>
+<body>
+
+   <!-- Header    background: linear-gradient(to left, #0B0F26, #590021, #0b0f26);-->
+<header class="header" style="background:linear-gradient(to left, #0B0F26, #590021);">
+    <div class="logo-header">
+        <i class="fas fa-bars" id="menu-toggle" style="font-size: 30px;"></i>
+        <span class="logo-text" style="margin-left: 30px;">Inventroy Management System</span>
+    </div>
+    <div class="profile">
+
+        <!-- Add this in the appropriate place in your layout file -->
+        <div id="notificationContainer">
+            @await Html.PartialAsync("_NotificationCenterPartial", new List<StartAlert>())
+        </div>
+
+        <img src="~/images/1.png" alt="Profile" class="profile-img">
+        <span class="profile-name">@User.Identity.Name</span>
+    </div>
+</header>
+
+
+    <!-- Sidebar container -->
+    <div class="sidebar collapsed" id="sidebar" style="background:linear-gradient(to bottom, #590021, #0B0F26);">
+        <!-- Logo and Title -->
+        <div class="logo-content">
+            <div class="logo">
+                <img src="~/images/1.png" alt="Profile Image" id="auth-img" class="profile-img-sidebar">
+            </div>
+            <div class="logo-name" id="sidebar-name">@User.Identity.Name</div>
+        </div>
+
+        <!-- Navigation links with icons -->
+         @if (User.Identity.IsAuthenticated)
+            {
+     <!-- Navigation links with icons -->
+            <ul class="nav-links">
+                <li>
+                    <a href="/home/index">
+                        <i class="fas fa-home"></i> <!-- Home Icon -->
+                        <span class="link-name">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Employee/Index">
+                        <i class="fas fa-users"></i> <!-- Users Icon -->
+                        <span class="link-name">User</span>
+                    </a>
+                </li>
+                <li style="margin-left: 5px;">
+                    <a href="/EmployeeSupplier/Index">
+                        <i class="fas fa-file-invoice"></i> 
+                        <span class="link-name">Receipt</span>
+                    </a>
+                </li>
+
+                <li style="margin-left: 2px;">
+                    <a href="/Product/Index">
+                        <i class="fas fa-box"></i> <!-- Box Icon -->
+                        <span class="link-name">Product</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Supplier/Index">
+                        <i class="fas fa-people-carry"></i> <!-- Carry Icon -->
+                        <span class="link-name">Supplier</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Transaction/Index">
+                        <i class="fas fa-exchange-alt"></i> <!-- Exchange Icon -->
+                        <span class="link-name">Transaction</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Category/Index">
+                        <i class="fas fa-tags"></i> <!-- Tags Icon -->
+                        <span class="link-name">Category</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Alert/Index">
+                        <i class="fas fa-exclamation-triangle"></i> <!-- Warning Icon -->
+                        <span class="link-name">Alert</span>
+                    </a>
+                </li>
+                @if (User.IsInRole("Admin") || User.IsInRole("admin"))
+                {
+                    <li>
+                        <a href="/Account/Register">
+                            <i class="fas fa-user-plus"></i> <!-- User Plus Icon -->
+                            <span class="link-name">Add Member</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Role/AddRole">
+                            <i class="fas fa-user-tag"></i> <!-- User Tag Icon -->
+                            <span class="link-name">Add Role</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+
+        }
+
+        <!-- Log out button -->
+        <div class="logout" style="margin-left: 8px; font-size:15px;">
+            <a href="/Account/SignOut">
+                <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i>
+                <span class="link-name">Log out</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="main-content" >
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </div>
+
+    <footer class="footerr">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">
+                   @*
+                    <a href="/Home/OurTeam" target="_blank">Meet Our Team</a>
+                   *@ 
+                    <a href="/Home/OurTeam" >Meet Our Team</a>
+                </p>
+            </div>
+            <p class="footer-copy">&copy; 2024 Melio-Tech Group. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <style>
+        /* Basic reset for body and html */
+        html, body {
+            height: 100%; /* Full height */
+            margin: 0; /* Remove default margin */
+            display: flex; /* Enable flexbox */
+            flex-direction: column; /* Stack children vertically */
+        }
+
+        .content {
+            flex: 1; /* Take up remaining space */
+            /* Add styles for your content here */
+        }
+
+        /* Fresh Footer Styling */
+        
+        .footerr {
+            background-color: #0B0F26;
+            color: #F21667; /* Light gray text for contrast */
+            padding-top: 15px;
+            padding-bottom: 1px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); /* Softer shadow */
+            border-top: 3px solid #F21667; /* Warm accent border */
+            margin-top: auto; /* Push footer to bottom */
+        }
+       
+        @*
+        footer {
+            background-color: #0B0F26; /* Adjust as needed */
+            color: white; /* Adjust as needed */
+            text-align: center;
+            padding: 1rem 0; /* Adjust padding as needed */
+            margin-top: auto; /* Push footer to bottom */
+        }
+        *@
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px; /* Spacing between elements */
+           margin-bottom: 0px;
+    margin-top: 5px;
+        }
+
+        /* Footer link styling */
+        .footer-text {
+            font-size: 18px;
+            font-family: 'Montserrat', sans-serif; /* Modern, geometric font */
+            font-weight: 600; /* Slightly bolder for emphasis */
+        }
+
+            .footer-text a {
+                color: white; /* Warm orange accent color */
+                text-decoration: none;
+                padding: 12px 24px; /* More padding for a button-like appearance */
+                border: 2px solid #F21667; /* Bold border */
+                border-radius: 50px; /* Fully rounded button */
+                transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Smooth transitions */
+            }
+
+                .footer-text a:hover {
+                    background-color: #F21667; /* Warm background on hover */
+                    color: white; /* Dark text on hover */
+                    border-color: #2a2d34; /* Border change on hover */
+                }
+
+        /* Footer copyright */
+        .footer-copy {
+            font-size: 14px;
+            font-family: 'Montserrat', sans-serif;
+            color: #9ca3af; /* Subtle gray text */
+            margin-top: 0px;
+    margin-bottom: 0px;
+        }
+    </style>
+
+    <script>
+        const toggleButton = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const authImg = document.getElementById('auth-img');
+        const sidebarName = document.getElementById('sidebar-name');
+
+        sidebar.classList.add('collapsed');
+        authImg.style.display = 'none';
+        sidebarName.style.display = 'none';
+
+        toggleButton.addEventListener('click', function () {
+            sidebar.classList.toggle('collapsed');
+            authImg.style.display = sidebar.classList.contains('collapsed') ? 'none' : 'block';
+            sidebarName.style.display = sidebar.classList.contains('collapsed') ? 'none' : 'block';
+        });
+
+
+
+
+
+        $(document).ready(function () {
+            // Load notifications when the page is loaded
+            loadNotifications();
+
+            // Load notifications when the notification dropdown is clicked
+            $('#notificationDropdown').on('click', function () {
+                loadNotifications();
+            });
+        });
+
+        function loadNotifications() {
+            $.ajax({
+                url: '@Url.Action("GetPendingAlerts", "Alert")', // Adjust the controller name if different
+                type: 'GET',
+                success: function (data) {
+                    $('#notificationContainer').html(data); // Update the container with the new notifications
+                },
+                error: function () {
+                    alert('Error loading notifications.');
+                }
+            });
+        }
+
+
+    </script>
+
+       
+
+
+
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

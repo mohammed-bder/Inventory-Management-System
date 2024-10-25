@@ -1,0 +1,45 @@
+﻿@model LoginUserViewModel
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+
+<div class="login-container">
+    <form method="post" asp-action="SaveLogin">
+        <div asp-validation-summary="ModelOnly" class="text-danger" style="color: red;"></div> <!-- Summary of all errors -->
+
+        <h2>Login</h2>
+        <div class="input-field">
+            <input type="text" asp-for="UserName">
+            <label asp-for="UserName">Enter your UserName</label>
+        </div >
+        <div class="input-field">
+            <input type="password" asp-for="Password">
+            <label asp-for="Password">Enter your password</label>
+        </div>
+        <div class="forget">
+            <label for="remember" asp-for="RememberMe">
+                <input type="checkbox" id="remember" asp-for="RememberMe">
+                <p>Remember me</p>
+            </label>
+            <a asp-controller="Account" asp-action="VerifyEmail" >Forgot password?</a>
+        </div>
+        <button type="submit">Log In</button>
+
+    </form>
+</div>
+
+
+<style>
+
+    input:-webkit-autofill {
+        appearance: none;
+        -webkit-box-shadow: 0 0 0 1000px white inset !important;
+        box-shadow: 0 0 0 1000px #241c2f inset !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+
+
+</style>
+

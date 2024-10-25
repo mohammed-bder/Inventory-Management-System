@@ -1,0 +1,139 @@
+﻿@model List<Supplier>
+
+@{
+    ViewData["Title"] = "GetAll";
+    int index = 1;
+}
+<header>
+    <style>
+   
+
+        .btn-success {
+            background-color: #0f1951;
+            border-color: #0f1951;
+        }
+    </style>
+</header>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<div class="container mt-5">
+    <h1 class="text-center text-primary">All Supplier</h1>
+    <hr />
+    <br />
+
+    <div class="d-flex justify-content-between mb-3">
+        <!-- Search form -->
+        <form class="form-inline d-flex w-50" method="get" asp-action="SearchByName">
+            <div class="input-group" style="width: 52%;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" style="border-radius: 12px 0 0 12px;">
+                        <i class="fas fa-search"></i> <!-- Font Awesome icon -->
+                    </span>
+                </div>
+                <input type="text" name="Name" class="form-control" style="border-radius: 0 12px 12px 0;" placeholder="Search by name" value="@ViewBag.SearchItem" />
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 124px; height: 40px; border-radius: 10px; margin-left: 12px;">Search</button>
+        </form>
+
+        <div>
+            <a href="@Url.Action("ExportToExcel", "Supplier")" class="btn btn-primary">Export to Excel</a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Add" asp-controller="Supplier" class="btn btn-success"><i class="fas fa-plus-circle"></i> New Supplier</a>
+            }
+        </div>
+
+        
+    </div>
+
+    <table class="table table-bordered text-center mx-auto">
+        <thead>
+            <tr>
+                @if (User.IsInRole("Admin"))
+                {
+                    <th scope="col">
+                        <input type="checkbox" id="selectAll" />
+                    </th>
+                }
+                <th scope="col">Supplier ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Address</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone</th>
+                @if (User.IsInRole("Admin"))
+                {
+                    <th scope="col">Actions</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var supplier in Model)
+            {
+                <tr>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <td>
+                            <input type="checkbox" class="selectRow" />
+                        </td>
+                    }
+                    <td>@index</td>
+                    <td>@supplier.Name</td>
+                    <td>@supplier.Address</td>
+                    <td>@supplier.Email</td>
+                    <td>@supplier.Phone</td>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <td>
+                            <a asp-action="Edit" asp-controller="Supplier" asp-route-id="@supplier.ID" class="btn btn-warning btn-sm">Update</a>
+                            <a href="javascript:void(0);" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal"
+                               onclick="setDeleteInfo('@Url.Action("Delete", "Supplier", new { id = supplier.ID })', '@supplier.Name')">Delete</a>
+                        </td>
+                    }
+
+                </tr>
+                ++index;
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete <strong id="supplierName"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a href="#" id="deleteButton" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function setDeleteInfo(url, name) {
+        document.getElementById('deleteButton').setAttribute('href', url);
+        document.getElementById('supplierName').textContent = name;
+    }
+
+    // Select All / Deselect All
+    document.getElementById('selectAll').addEventListener('change', function () {
+        var checked = this.checked;
+        document.querySelectorAll('.selectRow').forEach(function (checkbox) {
+            checkbox.checked = checked;
+        });
+    });
+</script>
+

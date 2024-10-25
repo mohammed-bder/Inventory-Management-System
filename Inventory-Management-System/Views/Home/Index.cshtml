@@ -1,0 +1,327 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    var topSellingProducts = ViewBag.TopSellingProducts as List<TopSellingProduct>;
+    var topEmployees = ViewBag.TopEmployees as List<TopEmployee>;
+}
+
+@model IEnumerable<DashboardCard>
+<body>
+
+<div class=" custom-container mt-4">
+    <!-- Apply the custom class here -->
+    <div class="row">
+        @foreach (var card in Model)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="custom-card shadow-lg" style="background-color:@card.BackgroundColor; color: white;">
+                    <div class="custom-card-body text-center">
+                        <i class="fas @card.Icon fa-3x mb-3"></i>
+                        <h5 class="custom-card-title">@card.Title</h5>
+                        <h2 class="custom-card-value">@card.Value</h2>
+                        <a href=@card.ActionLink class="btn btn-light btn-sm mt-3">More Info <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="container-fluid mt-5 px-5">
+    <h1 class="text-center mb-5 text-primary" style="font-size: 3rem;">Analytics Dashboard</h1>
+
+    <!-- Area Chart and Top Rating Employees Row -->
+    <div class="row justify-content-center mb-5">
+        <!-- Area Chart -->
+        <div class="col-lg-8 col-md-7 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary" style="font-size: 1.8rem;"> <i class="fas fa-chart-line me-2"></i> Sales Chart</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area" style="height: 500px; width: 100%;">
+                        <canvas id="myAreaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Rating Employees -->
+        <div class="col-lg-4 col-md-5 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-center"
+                        style="font-size: 1.8rem; color: #007bff;">
+                        <i class="fas fa-user-check me-2"></i> Top Rating Employees
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4" style="height: 500px; width: 100%;">
+                        <canvas id="employeesPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bar Chart and Top Selling Products Row -->
+    <div class="row justify-content-center">
+        <!-- Bar Chart -->
+        <div class="col-lg-8 col-md-7 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-center"
+                        style="font-size: 1.8rem; color: #007bff;">
+                        <i class="fas fa-box"></i> Top Selling Products
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-bar" style="height: 500px; width: 100%;">
+                        <canvas id="myBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+<script>
+        // Retrieve sales history from ViewBag
+        var salesHistory = @Html.Raw(Json.Serialize(ViewBag.SalesHistory)); // Ensure the sales history is serialized
+    console.log("Sales History:", salesHistory);
+
+    if (salesHistory && salesHistory.length > 0) {
+        const salesLabels = salesHistory.map(sale => sale.date);
+        const salesData = salesHistory
+            .map(sale => Number(sale.sales)); // Ensure sales values are numbers
+             // Filter out any non-numeric values
+
+        console.log("Sales Labels:", salesLabels);
+        console.log("Sales Data:", salesData);
+
+        // Area Chart
+        const ctxArea = document.getElementById("myAreaChart").getContext("2d");
+        const myAreaChart = new Chart(ctxArea, {
+            type: 'line',
+            data: {
+                labels: salesLabels,
+                datasets: [{
+                    label: "Sales per Date",
+                    backgroundColor: "rgba(78, 115, 223, 0.2)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    borderWidth: 2,
+                    fill: true,
+                    data: salesData,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Earnings'
+                        },
+                        ticks: {
+                            callback: function (value) {
+                                return '$' + value;
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        },
+                        autoSkip: false
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 20
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        console.error("No sales history data available.");
+    }
+
+
+    // Dynamic Bar Chart
+    const barLabels = @Html.Raw(Json.Serialize(topSellingProducts.Select(p => p.ProductName))); // Same labels as Top Selling Products
+    const barData = @Html.Raw(Json.Serialize(topSellingProducts.Select(p => p.TotalQuantity))); // Same data as Top Selling Products
+
+    const ctxBar = document.getElementById("myBarChart").getContext("2d");
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: barLabels,
+            datasets: [{
+                label: 'Total Quantity',
+                data: barData,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',  // Fill color for the bars
+                borderColor: 'rgba(54, 162, 235, 1)',        // Border color
+                borderWidth: 1,                              // Border width
+                hoverBackgroundColor: 'rgba(54, 162, 235, 0.7)', // Color when hovering
+                hoverBorderColor: 'rgba(54, 162, 235, 1)'   // Border color when hovering
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total Quantity'
+                    },
+                    ticks: {
+                        font: {
+                            size: 20 // Adjust this size for Y-axis labels
+                        },
+                        callback: function (value) {
+                            return value; // Add dollar sign to Y-axis labels
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 20 // Adjust this size for X-axis labels
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            size: 20 // Adjust this size for legend labels
+                        }
+                    }
+                },
+                tooltip: {
+                    bodyFont: {
+                        size: 16 // Adjust this size for tooltip labels
+                    },
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            return tooltipItem.dataset.label + tooltipItem.parsed.y; // Add dollar sign to tooltips
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Top Rating Employees Chart
+    const employeeLabels = @Html.Raw(Json.Serialize(topEmployees.Select(e => e.EmpName)));
+    const employeeData = @Html.Raw(Json.Serialize(topEmployees.Select(e => e.TotalSells)));
+
+
+    new Chart(document.getElementById('employeesPieChart'), {
+        type: 'pie',
+        data: {
+            labels: employeeLabels,
+            datasets: [{
+                data: employeeData,
+                backgroundColor: [
+                    'rgba(0, 128, 128, 0.7)',   // Teal
+                    'rgba(255, 99, 71, 0.7)',   // Tomato
+                    'rgba(64, 224, 208, 0.7)',  // Turquoise
+                    'rgba(75, 0, 130, 0.7)',    // Indigo
+                    'rgba(250, 128, 114, 0.7)'  // Salmon
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            size: 18 // Adjust this size for legend labels
+                        }
+                    }
+                },
+                tooltip: {
+                    bodyFont: {
+                        size: 18 // Adjust this size for tooltip labels
+                    },
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            return tooltipItem.label + ': $' + tooltipItem.parsed; // Add dollar sign to pie chart tooltips
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+
+
+
+
+<style>
+    /* Custom Container Styles */
+    .custom-container {
+        max-width: 1500px; /* Set max width */
+        margin: 0 auto; /* Center the container */
+    }
+
+    /* Custom Card Styles */
+    .custom-card {
+        width: 350px;
+        border-radius: 10px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        padding: 20px;
+        margin: 0 auto; /* Center the card */
+    }
+
+    /* Hover effect */
+    .custom-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Adjust the custom card title */
+    .custom-card-title {
+        font-size: 1.25rem;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    /* Adjust the custom card value */
+    .custom-card-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    /* Custom button style */
+    .btn-light {
+        font-weight: 500;
+        border-radius: 30px;
+    }
+
+    /* Centered content */
+    .text-center {
+        padding: 20px;
+    }
+
+    .container-fluid h1 {
+        font-size: 2rem;
+    }
+
+    .card-header h6 {
+        font-size: 1.5rem;
+    }
+
+</style>

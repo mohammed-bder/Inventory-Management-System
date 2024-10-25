@@ -1,0 +1,162 @@
+﻿@model TransactionWithProducts
+
+@{
+    ViewData["Title"] = "Add Transaction";
+    var products = Model.AvailableProducts;
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Add Transaction</h1>
+    <hr />
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form asp-action="ShowBill">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div asp-validation-summary="All" class="alert alert-danger mb-3"></div>
+                }
+                <input type="hidden" asp-for="EmployeeId" value="@ViewBag.EmpId" name="EmployeeId" />
+
+                <div id="product-details" class="mb-4">
+                    <!-- Initial product entry -->
+                    <div class="product-entry card mb-3 p-2 shadow-sm">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3 flex-grow-1">
+                                <select name="ProductDetails[0].ProductId" class="form-select" required>
+                                    <option value="">-- Select Product --</option>
+                                    @foreach (var product in products)
+                                    {
+                                        <option value="@product.ID">@product.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="me-2" style="width: 100px;">
+                                <input type="number" name="ProductDetails[0].Quantity" class="form-control" required min="1" placeholder="Qty" />
+                            </div>
+                            <button type="button" class="btn btn-outline-danger remove-product">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="add-product" class="btn btn-outline-primary mb-3">
+                    <i class="fa-solid fa-plus-circle"></i> Add Product
+                </button>
+
+                <div class="text-center">
+                    <input type="submit" value="Create Transaction" class="btn btn-primary btn-lg" />
+                </div>
+            </form>
+
+            <script>
+                let productIndex = 1;
+
+                // Add new product entry
+                document.getElementById('add-product').addEventListener('click', function () {
+                    const productDetails = document.getElementById('product-details');
+
+                    const newEntry = document.createElement('div');
+                    newEntry.className = 'product-entry card mb-3 p-2 shadow-sm';
+                    newEntry.innerHTML = `
+                                        <div class="card-body d-flex align-items-center">
+                                            <div class="me-3 flex-grow-1">
+                                                <select name="ProductDetails[${productIndex}].ProductId" class="form-select" required>
+                                                    <option value="">-- Select Product --</option>
+                @foreach (var product in products)
+                {
+                                                            <option value="@product.ID">@product.Name</option>
+                }
+                                                </select>
+                                            </div>
+                                            <div class="me-2" style="width: 100px;">
+                                                <input type="number" name="ProductDetails[${productIndex}].Quantity" class="form-control" required min="1" placeholder="Qty" />
+                                            </div>
+                                            <button type="button" class="btn btn-outline-danger remove-product">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    `;
+
+                    productDetails.appendChild(newEntry);
+                    productIndex++;
+                    attachRemoveEvent(newEntry);
+                });
+
+                // Attach remove event to the "remove product" buttons
+                function attachRemoveEvent(entry) {
+                    entry.querySelector('.remove-product').addEventListener('click', function () {
+                        entry.remove();
+                    });
+                }
+
+                // Attach the remove event to the initial product entry
+                document.querySelectorAll('.product-entry').forEach(attachRemoveEvent);
+            </script>
+        </div>
+    </div>
+
+    <style>
+        .product-entry {
+            border-radius: 10px;
+            transition: box-shadow 0.3s ease;
+        }
+
+            .product-entry:hover {
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+        .form-select, .form-control {
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .form-select {
+            height: calc(2.25rem + 2px); /* Adjust as necessary */
+            border-radius: 0.375rem; /* Match the input style */
+        }
+
+        .form-control {
+            position: relative; /* Ensure that position can be used for absolute positioning if needed */
+        }
+
+            .form-control::placeholder {
+                color: #6c757d; /* Change placeholder color */
+                opacity: 1; /* Firefox lowers the opacity of the placeholder */
+            }
+        .btn {
+            border-radius: 8px;
+        }
+
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-outline-primary {
+            color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+            .btn-outline-danger:hover,
+            .btn-outline-primary:hover {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+    </style>
+
+    <div class="text-center mt-3">
+        <a asp-action="Index" class="btn btn-link">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

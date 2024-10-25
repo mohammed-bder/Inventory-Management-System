@@ -1,0 +1,254 @@
+﻿@model List<Product>
+
+@{
+    var categories = ViewBag.categories as List<Category>;
+    var selectedCategoryId = ViewBag.selectedCategoryId as int?;
+    var searchString = ViewBag.name as string;
+    int iterator = 1;
+}
+<body>
+
+    <div class="mycontainer-fluid">
+        <div class="mycontainer mt-4 content">
+            <div class="mb-0">
+            <ul class="nav nav-tabs" style="margin: 0; padding: 0;">
+                <li class="nav-item">
+                    @{
+                        var isAllActive = (selectedCategoryId == null) ? "active" : "";
+                            var bgColorAll = (selectedCategoryId == null) ? "#F21667" : "#0f1951";
+                    }
+                    <a class="nav-link @isAllActive"
+                       style="background-color: @bgColorAll; color: #ffff; border-radius: 10px 10px 0 0;
+                              padding: 8px 20px; font-size: 18px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);"
+                       href="@Url.Action("Index", new { id = (int?)null })">All</a>
+                </li>
+
+                @foreach (var item in categories)
+                {
+                    var isActive = (selectedCategoryId == item.ID) ? "active" : "";
+                        var bgColor = (selectedCategoryId == item.ID) ? "#F21667" : "#0f1951";
+                    <li class="nav-item">
+                        <a class="nav-link @isActive"
+                           style="background-color: @bgColor; color: #ffff; border-radius: 10px 10px 0 0;
+                                  padding: 8px 20px; font-size: 18px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);"
+                           href="@Url.Action("Index", new { id = item.ID })">@item.Name</a>
+                    </li>
+                }
+            </ul>
+        </div>
+
+            <div class="p-0" style="margin-right: 0; margin-left: 0;">
+            <div class="card p-3 shadow-sm">
+                    <div style="display:flex; justify-content: space-between; align-items: center;">
+                        <h4 class="text-primary fw-bold" style="font-size: 30px; color:#F21667 !important;">In Stock</h4>
+                        <div class="align-items-center mb-3" style="padding: 25px 13px 0px; justify-content: right; gap: 20px; display:flex;" >
+                                    <form id="deleteForm" method="post" action="/Product/Delete" onsubmit="return validateSelection()">
+                                        <input type="hidden" name="selectedIds" value="" id="selectedIdsField" />
+                                        <button type="button" id="deleteButton" class="btn btn-danger" style="display: none;"
+                                                data-bs-toggle="modal" data-bs-target="#confirmationModal">
+                                            Delete Selected
+                                        </button>
+                                    </form>
+
+
+                            <a href="@Url.Action("ExportToExcel", "Product")" class="btn btn-primary">Export to Excel</a>
+                            <a href="/Product/Add" class="btn btn-primary">+ New Product</a>
+                        </div>
+
+                    </div>
+
+                <hr class="mb-4" style="background-color: #f9f9f9; height: 1px; margin-top: -2px;" />
+
+                <div class="d-flex justify-content-between align-items-center mb-3" style="margin: 10px 0px;">
+                    <form asp-action="Search" asp-controller="Product" method="get" class="d-flex" id="searchForm">
+                        <div class="input-group me-3" style="width: 300px;">
+                            <span class="input-group-text bg-white border-0">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="name" class="form-control border-start-0" placeholder="Quick search"
+                                   value="@searchString" />
+                        </div>
+                        <input type="hidden" name="id" value="@ViewBag.SelectedCategoryId" />
+                        <button class="btn btn-primary" type="submit">Search</button>
+                    </form>
+
+
+
+
+
+                        <div class="dropdown">
+                            <button class="btn btn-light me-2 dropdown-toggle" type="button" id="statusDropdown"
+                                    onclick="toggleDropdown()" aria-expanded="false">
+                                <i class="bi bi-funnel me-1"></i>Status
+                            </button>
+
+                            <ul class="dropdown-menu" aria-labelledby="statusDropdown" id="statusDropdownMenu">
+                                <li><a class="dropdown-item" href="#" onclick="submitStatusFilter('')">All Levels</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="submitStatusFilter('Safe')">Safe</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="submitStatusFilter('Low')">Low</a></li>
+                            </ul>
+
+                            <form asp-action="StatusFilter" asp-controller="Product" method="get" id="filterForm" class="d-none">
+                                <input type="hidden" name="status" id="selectedStatus" />
+                                <input type="hidden" name="id" value="@ViewBag.selectedCategoryId" />
+                            </form>
+                        </div>
+
+                </div>
+
+
+
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" /></th>
+                                    <th>ID</th>
+                                    <th>Product</th>
+                                    <th>Unit Price</th>
+                                    <th>Category</th>
+                                    <th>Supplier</th>
+                                    <th>Stock Quantity</th>
+                                    <th>Level</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in Model)
+                                {
+                                    <tr onclick="toggleCheckbox(this)">
+                                        <td><input type="checkbox" class="product-checkbox" name="selectedIds" value="@product.ID" onclick="event.stopPropagation();" /></td>
+                                        <td>@iterator</td>
+                                        <td>@product.Name</td>
+                                        <td>@product.UnitPrice.ToString("C")</td>
+                                        <td>@product.category.Name</td>
+                                        <td>@product.supplier.Name</td>
+                                        <td>@product.StockQuantity</td>
+                                        <td>
+                                            <span class="badge @((product.StockQuantity > 5) ? "bg-success" : "bg-danger")" style="color: white;">
+                                                @((product.StockQuantity > 5) ? "Safe" : "Low")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="/Product/Edit/@product.ID" class="btn btn-outline-secondary btn-sm">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    iterator++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                <div class="modal fade" id="confirmationModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirm Deletion</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">Are you sure you want to delete the selected products?</div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+
+    <script>
+        // Function to submit the status filter form
+        function submitStatusFilter(status) {
+            document.getElementById('selectedStatus').value = status;
+            document.getElementById('filterForm').submit();
+        }
+
+        function toggleDropdown() {
+            const dropdownMenu = document.getElementById('statusDropdownMenu');
+            const isOpen = dropdownMenu.classList.contains('show');
+
+            // Toggle the 'show' class to control visibility
+            if (isOpen) {
+                dropdownMenu.classList.remove('show');
+            } else {
+                dropdownMenu.classList.add('show');
+            }
+        }
+
+
+        function toggleSelectAll(source) {
+            const checkboxes = document.querySelectorAll('.product-checkbox');
+            checkboxes.forEach(checkbox => checkbox.checked = source.checked);
+            toggleDeleteButton();
+        }
+
+        function toggleCheckbox(row) {
+            const checkbox = row.querySelector('.product-checkbox');
+            checkbox.checked = !checkbox.checked;
+            toggleDeleteButton();
+        }
+
+        function toggleDeleteButton() {
+            const anyChecked = document.querySelectorAll('.product-checkbox:checked').length > 0;
+            document.getElementById('deleteButton').style.display = anyChecked ? 'block' : 'none';
+        }
+
+        function validateSelection() {
+            const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (selectedIds.length === 0) {
+                alert("Please select at least one product to delete.");
+                return false;
+            }
+
+            // Set the selected IDs in the hidden input field
+            document.getElementById('selectedIds').value = selectedIds.join(',');
+            return true;
+        }
+
+        document.getElementById('confirmDelete').addEventListener('click', () => {
+            const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+                .map(checkbox => checkbox.value);
+
+            // Set the selected IDs in the hidden input field as a comma-separated string.
+            document.getElementById('selectedIdsField').value = selectedIds.join(',');
+
+            // Submit the form.
+            document.getElementById('deleteForm').submit();
+        });
+
+    </script>
+
+    <style>
+
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        background-color: #f5f5f5;
+    }
+
+    .card {
+        border-radius: 8px;
+    }
+
+    .mycontainer-fluid {
+        padding: 15px;
+    }
+
+    .mycontainer {
+        width: 100%;
+    }
+
+  
+
+    </style>

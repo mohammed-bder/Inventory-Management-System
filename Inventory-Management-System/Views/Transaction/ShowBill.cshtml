@@ -1,0 +1,61 @@
+﻿@model TransactionWithProducts
+
+@{
+    ViewData["Title"] = "Bill Summary";
+    List<Product> products = Model.SelectedProducts;
+    double grandTotal = Model.TotalPrice ?? 0;
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Bill Summary</h1>
+    <div class="card p-4 border-0 shadow-sm">
+        <h5 class="mb-4">Transaction Details</h5>
+        <form asp-action="FinalizeTransaction" method="post">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < products.Count; i++)
+                    {
+                        <tr>
+                            <td>@products[i].Name</td>
+                            <td>
+                                <!-- Display quantity as read-only text -->
+                                <span>@Model.ProductDetails[i].Quantity</span>
+                                <input type="hidden" name="ProductDetails[@i].Quantity" value="@Model.ProductDetails[i].Quantity" />
+                            </td>
+                            <td>@products[i].UnitPrice.ToString("C")</td>
+                            <td>@((Model.ProductDetails[i].Quantity * products[i].UnitPrice).ToString("C"))</td>
+
+                            <!-- Include other product detail fields as needed -->
+                            <input type="hidden" name="ProductDetails[@i].ProductId" value="@Model.ProductDetails[i].ProductId" />
+                            <input type="hidden" name="ProductDetails[@i].Quantity" value="@Model.ProductDetails[i].Quantity" />
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <input type="hidden" name="TotalPrice" value="@grandTotal" />
+            <input type="hidden" name="EmployeeId" value="@Model.EmployeeId" />
+
+            <div class="text-end">
+                <h5>Total: @grandTotal.ToString("C")</h5> <!-- Grand Total -->
+            </div>
+
+            <div class="text-center mt-4">
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                <input type="submit" value="Finalize Transaction" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
